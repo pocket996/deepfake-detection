@@ -1,2 +1,29 @@
-# eeg-wheelchair
-Motor-imagery EEG brain-computer interface driving a small car — a closed-loop prototype and blueprint for mind-controlled wheelchairs. Cross-subject robust decoding, real-time inference, and layered safety.  
+# EEG Wheelchair
+
+基于公开运动想象 EEG 数据回放的小车闭环控制原型。
+
+本项目使用公开数据集验证“EEG 数据 → 意图分类 → 安全决策 → 小车执行”的完整技术链路。当前目标是完成可重复、可量化、失效即停车的低风险演示原型，而不是制造可载人的医疗轮椅，也不包含真人 EEG 采集、校准或在线实验。
+
+## 当前 MVP
+
+- 使用 BCI Competition IV 2b 等公开数据进行左右手运动想象二分类；
+- 以 CSP + LDA 作为首个可解释、轻量的算法基线；
+- 按原始时间顺序回放测试数据，模拟实时输入；
+- 将稳定的分类结果转换为 `LEFT`、`RIGHT` 或 `STOP`；
+- 通过串口或蓝牙控制低速小车执行短时动作；
+- 在低置信度、数据中断、通信超时或程序异常时默认停车。
+
+## 文档
+
+- [MVP 范围与验收](docs/MVP.md)
+- [后续路线图](docs/ROADMAP.md)
+- [系统架构](docs/ARCHITECTURE.md)
+- [通信协议草案](docs/PROTOCOL.md)
+
+## 当前状态
+
+项目处于规划和工程初始化阶段，尚未提供可运行代码、训练模型或实验结果。后续工作通过 GitHub Issues 拆分，并通过功能分支和 Pull Request 合并到 `main`。
+
+## 安全边界
+
+小车仅用于架空车轮或封闭低速场地测试。项目结果不能证明医疗可用性，不应用于载人移动或临床决策。
