@@ -1,0 +1,4 @@
+# Official direct wheels for Windows x64 / Python 3.11.
+# Index metadata endpoint failed with TLS EOF on this machine.
+torch @ https://download.pytorch.org/whl/cu128/torch-2.9.0%2Bcu128-cp311-cp311-win_amd64.whl
+torchvision @ https://download.pytorch.org/whl/cu128/torchvision-0.24.0%2Bcu128-cp311-cp311-win_amd64.whl
