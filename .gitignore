@@ -4,3 +4,4 @@ data/
 weights/
 outputs/
 *.pyc
+tools/download-FaceForensics.py

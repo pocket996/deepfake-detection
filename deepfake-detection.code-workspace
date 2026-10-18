@@ -1,0 +1,8 @@
+{
+  "folders": [
+    { "name": "AI 人脸生成与篡改检测系统", "path": "." }
+  ],
+  "settings": {
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe"
+  }
+}
