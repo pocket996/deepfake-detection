@@ -3,3 +3,7 @@ artifacts/
 weights/
 __pycache__/
 *.log
+.release-venv/
+build/
+dist/
+release-output/

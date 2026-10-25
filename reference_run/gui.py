@@ -9,8 +9,9 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 
 from PIL import Image, ImageOps, ImageTk
+from app_paths import APP_VERSION, application_directory
 
-HERE = Path(__file__).resolve().parent
+HERE = application_directory()
 BG, CARD, INK, MUTED = '#f3f6fb', '#ffffff', '#15243b', '#64748b'
 BLUE, GREEN, RED = '#2563eb', '#087f70', '#bd3d44'
 FONT = 'Microsoft YaHei UI'
@@ -27,7 +28,7 @@ class FaceGuardApp:
         self.busy, self.selection, self.started = False, 0, 0
         self.events, self.photo = queue.Queue(), None
         self.task_var = tk.StringVar(value=TASK_NAMES[0])
-        root.title('FaceGuard · AI 整脸生成与人脸篡改检测')
+        root.title(f'FaceGuard {APP_VERSION} · AI 整脸生成与人脸篡改检测')
         root.geometry(f'1160x{min(900, root.winfo_screenheight() - 100)}')
         root.minsize(1060, 650)
         root.configure(bg=BG)
@@ -69,7 +70,10 @@ class FaceGuardApp:
         self.label(header, '本机处理 · 文件不会上传', 10, GREEN).pack(side='right')
         guide = tk.Frame(content, bg='#e8f0ff', padx=18, pady=13)
         guide.pack(fill='x', padx=28, pady=(0, 18))
-        self.label(guide, '第一次使用？点击左侧「载入 AI 生成示例」，再点击「开始检测」。', 12, BLUE, True).pack(anchor='w')
+        self.examples_available = (HERE / 'artifacts/generation/joint/example_1.json').is_file() or (HERE / 'artifacts/generation/example_1.json').is_file()
+        guide_text = ('第一次使用？点击左侧「载入 AI 生成示例」，再点击「开始检测」。'
+                      if self.examples_available else '使用两步：左侧选择照片或视频，再点击蓝色「开始检测」。')
+        self.label(guide, guide_text, 12, BLUE, True).pack(anchor='w')
         task_row = tk.Frame(guide, bg=guide.cget('bg'))
         task_row.pack(fill='x', pady=(7, 0))
         self.label(task_row, '照片默认查整脸生成；如需查照片换脸，请切换检测项目。', 10, MUTED).pack(side='left')
@@ -94,12 +98,15 @@ class FaceGuardApp:
             button = self.button(left, text, callback)
             button.pack(fill='x', pady=(0, 9))
             self.select_buttons.append(button)
-        self.label(left, '没有现成文件？先用示例体验', 10, MUTED).pack(anchor='w', pady=(20, 9))
+        self.label(left, '没有现成文件？先用示例体验' if self.examples_available else '离线使用，无需下载训练数据', 10, MUTED).pack(anchor='w', pady=(20, 9))
         for text, label in [('载入真实照片示例', '0'), ('载入 AI 生成示例', '1')]:
             button = self.button(left, text, lambda value=label: self.load_example(value))
             button.pack(fill='x', pady=(0, 9))
             self.select_buttons.append(button)
-        self.label(left, '示例有已知标签，便于对照结果。', 9, MUTED, wraplength=202, justify='left').pack(anchor='w', pady=(2, 20))
+            if not self.examples_available:
+                button.config(state='disabled')
+        example_note = '示例有已知标签，便于对照结果。' if self.examples_available else '本发布包不含个人照片或数据集。\n请使用上方按钮选择自己的文件。'
+        self.label(left, example_note, 9, MUTED, wraplength=202, justify='left').pack(anchor='w', pady=(2, 20))
         tk.Frame(left, bg='#e8edf5', height=1).pack(fill='x', pady=(0, 20))
         self.label(left, '02  开始检测', 14, bold=True).pack(anchor='w')
         self.start_button = self.button(left, '开始检测', self.start, primary=True)
@@ -307,6 +314,9 @@ class FaceGuardApp:
         self.progress.config(mode='determinate', value=100 if prediction else 0)
         for button in self.select_buttons + [self.start_button]:
             button.config(state='normal')
+        if not self.examples_available:
+            for button in self.select_buttons[2:]:
+                button.config(state='disabled')
         self.start_button.config(text='重新检测此文件')
         self.start_hint.config(text='可更换文件，继续检测', fg=MUTED)
         if error:
@@ -392,6 +402,9 @@ def main():
     parser.add_argument('--self-test', action='store_true', help='Exercise real select/start/result/report workflow')
     parser.add_argument('--self-test-task', choices=['generation', 'manipulation'], default='generation')
     parser.add_argument('--screenshot', type=Path)
+    parser.add_argument('--test-input', type=Path, help='Local input for testing a portable build without bundled datasets')
+    parser.add_argument('--test-output', type=Path)
+    parser.add_argument('--expected-decision')
     args = parser.parse_args()
     # Keep Tk coordinates and screenshot pixels consistent on Windows HiDPI displays.
     import sys
@@ -409,7 +422,10 @@ def main():
     if args.self_test:
         app.task_var.set(TASK_NAMES[1] if args.self_test_task == 'generation' else TASK_NAMES[2])
         app.task_changed()
-        app.load_example('1')
+        if args.test_input:
+            app.select_path(args.test_input)
+        else:
+            app.load_example('1')
         assert str(app.start_button.cget('state')) == 'normal'
         app.start()
         assert app.busy and str(app.start_button.cget('state')) == 'disabled'
@@ -421,11 +437,13 @@ def main():
                 return
             try:
                 assert app.prediction is not None, app.coverage.cget('text')
-                expected = 'suspected_generation' if args.self_test_task == 'generation' else 'suspected_manipulation'
-                assert app.prediction['decision'] == expected
+                expected = args.expected_decision or ('suspected_generation' if args.self_test_task == 'generation' else 'suspected_manipulation')
+                assert app.prediction['decision'] == expected, (app.prediction['decision'], expected)
                 assert str(app.export_button.cget('state')) == 'normal'
                 assert app.result_title.cget('text') in app.report_text()
-                (HERE / f'artifacts/ui_workflow_check_{args.self_test_task}.json').write_text(json.dumps({
+                output = args.test_output or HERE / f'artifacts/ui_workflow_check_{args.self_test_task}.json'
+                output.parent.mkdir(parents=True, exist_ok=True)
+                output.write_text(json.dumps({
                     'select_start_result_report': 'passed', 'preview_loaded': app.photo is not None,
                     'decision': app.prediction['decision'], 'score': app.prediction['score']}, indent=2), encoding='utf-8')
                 if args.screenshot:

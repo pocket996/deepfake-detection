@@ -2,6 +2,12 @@
 
 面向包含人脸的照片与视频，检测 AI 整脸生成、换脸及面部篡改。现已完成独立参考实现，包括数据整理、模型训练与评估、命令行推理和中文桌面界面。
 
+## 队友直接使用：Windows 免安装包
+
+打开 [v0.1.0 Releases](https://github.com/pocket996/deepfake-detection/releases/tag/v0.1.0)，下载 **FaceGuard-v0.1.0-windows-x64-cpu.zip**，完整解压后双击 **FaceGuard.exe**。不需要 Python、独立显卡或训练数据；不要误下载 GitHub 自动生成的 Source code 压缩包。
+
+这是 Windows 10/11 x64 CPU 预览版，包含必要模型与运行时，只在本机处理文件。[队友操作说明](docs/TEAM_QUICKSTART.md) · [项目不足的大白话说明](docs/PROJECT_LIMITATIONS_PLAIN.md) · [模型范围与来源](docs/MODEL_CARD.md)。
+
 ## 最新参考实现
 
 - [使用教程与源码阅读](reference_run/README.md)：独立的 `reference_run` 目录和 Python 环境。
@@ -12,7 +18,7 @@
 
 本机已配置好环境和模型时，双击 `reference_run/run_demo.cmd` 打开界面。照片若要查换脸，在顶部切换检测项目。整脸生成检测仍是实验版，不能把库内高分或单张 GPT 个例的结果视为对所有生成器有效。
 
-**GitHub 仅保存源码、依赖版本和文档。** 数据集、虚拟环境、训练权重、特征缓存、日志和个人图片均未上传；新克隆的仓库需要按教程准备数据、环境和模型后才能运行演示。下文保留基础环境与原始数据准备说明。
+**Git 历史仅保存源码、依赖版本和文档；Releases 附件另提供便携运行时和推理模型。** 数据集、开发环境、特征缓存、日志和个人图片不分发。只 clone 源码仍需按教程准备环境与模型；想直接检测请下载上方免安装包。下文保留基础环境与原始数据准备说明。
 
 ## 本机环境
 

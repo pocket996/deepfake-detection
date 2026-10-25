@@ -11,8 +11,9 @@ from PIL import Image, ImageOps
 import torch
 from torch import nn
 from torchvision import models, transforms
+from app_paths import application_directory
 
-HERE = Path(__file__).resolve().parent
+HERE = application_directory()
 PROJECT = HERE.parent
 MEAN = [0.485, 0.456, 0.406]
 STD = [0.229, 0.224, 0.225]

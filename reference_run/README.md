@@ -2,7 +2,9 @@
 
 **新增 AI 整脸生成检测分支**：使用方式与当前联合模型实测结果分别见 [GENERATION_README.md](GENERATION_README.md)、[GENERATION_CURRENT.md](GENERATION_CURRENT.md)。第一版跨生成器实验另存 GENERATION_RESULTS.md。现在默认照片检测整脸生成，视频检测换脸/面部篡改；照片要查换脸时，在界面上方切换「检测项目」。下文记录原 FF++ 第一阶段，数据状态以新增分支报告为准。
 
-**GitHub 快照说明**：仓库不包含本机 `.venv`、数据集、模型权重、特征、运行日志及个人测试图片。下文“已经准备好”描述的是本次实测机器；新机器需先按本文及 GENERATION_README.md 重建环境、取得数据并训练模型。YuNet 权重的获取方法见父目录 docs/ffpp-preparation.md。
+**队友直接使用**：推荐下载 [Windows CPU 免安装预览版](https://github.com/pocket996/deepfake-detection/releases/tag/v0.1.0)，解压后双击 FaceGuard.exe。[操作说明](../docs/TEAM_QUICKSTART.md)。
+
+**Git 源码快照说明**：源码树不包含本机 `.venv`、数据集、模型权重、特征、运行日志及个人测试图片；Release 附件另包含便携运行时与必要推理模型。下文“已经准备好”描述的是实测机器；新机器若需要源码训练，需先按本文及 GENERATION_README.md 重建环境和准备数据。YuNet 权重的获取方法见父目录 docs/ffpp-preparation.md。
 
 这是供学习和复现的**人脸换脸/篡改检测基线**。包含数据审计、真实训练、参数选择、视频级测试、未见方法实验、图片/视频推理和本地桌面演示。准确结果和实际耗时见 [RESULTS.md](RESULTS.md)。
 
