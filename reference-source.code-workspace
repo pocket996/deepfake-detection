@@ -1,0 +1,29 @@
+{
+  "folders": [
+    {
+      "name": "FaceGuard 参考实现 · 源码阅读",
+      "path": "reference_run"
+    }
+  ],
+  "settings": {
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
+    "files.exclude": {
+      "**/__pycache__": true,
+      ".venv": true,
+      "weights": true,
+      "data": true,
+      "artifacts/*.npy": true,
+      "artifacts/*.pt": true,
+      "*.log": true
+    },
+    "search.exclude": {
+      "**/.venv/**": true,
+      "**/weights/**": true,
+      "**/data/**": true,
+      "**/artifacts/**": true,
+      "**/__pycache__/**": true,
+      "**/*.log": true
+    },
+    "editor.wordWrap": "on"
+  }
+}
