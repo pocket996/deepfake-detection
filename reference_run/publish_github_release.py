@@ -27,6 +27,7 @@ def main():
     parser.add_argument('--commit')
     parser.add_argument('--notes', type=Path)
     parser.add_argument('--asset', type=Path, action='append', default=[])
+    parser.add_argument('--transport', choices=['urllib', 'curl'], default='urllib')
     parser.add_argument('--result', type=Path, default=Path('reference_run/release-output/github_release.json'))
     args = parser.parse_args()
     token = credentials()
@@ -80,19 +81,38 @@ def main():
                     print('Uploading', file.name, f'{self.total / 1024**2:.0f} MiB', flush=True)
                     self.last = self.total
                 return block
-        with file.open('rb') as stream:
-            request = urllib.request.Request(release['upload_url'].split('{')[0] + '?name=' + urllib.parse.quote(file.name),
-                data=UploadReader(stream), headers={**headers, 'Content-Type': 'application/octet-stream',
-                    'Content-Length': str(file.stat().st_size)}, method='POST')
-            with urllib.request.urlopen(request, timeout=300) as response:
-                assert response.status == 201
-                asset = json.load(response)
+        url = release['upload_url'].split('{')[0] + '?name=' + urllib.parse.quote(file.name)
+        if args.transport == 'curl':
+            # Pass authorization only on stdin, never in process arguments or log output.
+            config = '\n'.join('header = ' + json.dumps(key + ': ' + value) for key, value in headers.items())
+            command = ['curl.exe', '--config', '-', '--http1.1', '--silent', '--show-error',
+                '--connect-timeout', '30', '--max-time', '1800', '--request', 'POST', '--upload-file', str(file.resolve()),
+                '--header', 'Content-Type: application/octet-stream', '--header', 'Expect:',
+                '--url', url, '--write-out', '\n%{http_code}']
+            result = subprocess.run(command, input=config, text=True, capture_output=True)
+            if result.returncode:
+                raise RuntimeError('Native upload failed: ' + result.stderr[-500:])
+            body, status = result.stdout.rsplit('\n', 1)
+            if status.strip() != '201':
+                raise RuntimeError('Native upload HTTP ' + status.strip() + ': ' + file.name)
+            asset = json.loads(body)
+        else:
+            with file.open('rb') as stream:
+                request = urllib.request.Request(url,
+                    data=UploadReader(stream), headers={**headers, 'Content-Type': 'application/octet-stream',
+                        'Content-Length': str(file.stat().st_size)}, method='POST')
+                with urllib.request.urlopen(request, timeout=300) as response:
+                    assert response.status == 201
+                    asset = json.load(response)
         assert asset['size'] == file.stat().st_size
         if asset.get('digest'):
             assert asset['digest'] == 'sha256:' + digest
         assets.append(dict(name=asset['name'], bytes=asset['size'], sha256=digest, url=asset['browser_download_url']))
         print('Uploaded', file.name, asset['size'], flush=True)
     release = api('PATCH', f"/repos/{REPO}/releases/{release['id']}", dict(draft=False))
+    published_assets = {item['name']: item for item in release.get('assets', [])}
+    for item in assets:
+        item['url'] = published_assets[item['name']]['browser_download_url']
     result = dict(id=release['id'], tag=args.tag, commit=args.commit, url=release['html_url'], draft=release['draft'],
                   prerelease=release['prerelease'], assets=assets)
     args.result.write_text(json.dumps(result, indent=2), encoding='utf-8')

@@ -38,4 +38,6 @@ reference_run/.release-venv/Scripts/python.exe reference_run/check_portable_rele
 
 `publish_github_release.py` 使用 Git 已配置的 GitHub 凭据，凭据只在内存中，不打印、不写入发布文件。它先创建预发布草稿，上传并核对附件大小及校验值，最后发布。草稿上传失败可根据本地草稿记录恢复，已公开的同名版本不会自动覆盖。
 
+若 Python 上传遇到连接中断，可传 `--transport curl` 使用 Windows 原生 curl；认证头经 stdin 提供，不出现在进程命令行。草稿附件会按校验值去重，失败的同名附件可在重试时替换。发布后使用正式标签的附件地址，不能沿用草稿阶段的 untagged 地址。
+
 官方参考：[PyInstaller 使用说明](https://pyinstaller.org/en/stable/usage.html)、[运行时资源路径](https://pyinstaller.org/en/stable/runtime-information.html)、[GitHub Release API](https://docs.github.com/en/rest/releases/releases)。
