@@ -5,3 +5,4 @@ weights/
 outputs/
 *.pyc
 tools/download-FaceForensics.py
+artifacts/
