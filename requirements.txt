@@ -4,3 +4,4 @@ Pillow==11.3.0
 pandas==2.2.3
 scikit-learn==1.6.1
 tqdm==4.67.1
+pyarrow==23.0.1

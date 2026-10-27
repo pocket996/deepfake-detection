@@ -1,8 +1,10 @@
 # FaceGuard：从现有数据到可运行模型的独立参考实现
 
+[Current development environment setup](../docs/TEAM_ENV_SETUP.md). The commands below use the root .venv.
+
 **新增 AI 整脸生成检测分支**：使用方式与当前联合模型实测结果分别见 [GENERATION_README.md](GENERATION_README.md)、[GENERATION_CURRENT.md](GENERATION_CURRENT.md)。第一版跨生成器实验另存 GENERATION_RESULTS.md。现在默认照片检测整脸生成，视频检测换脸/面部篡改；照片要查换脸时，在界面上方切换「检测项目」。下文记录原 FF++ 第一阶段，数据状态以新增分支报告为准。
 
-**队友直接使用**：推荐下载 [Windows CPU 免安装预览版](https://github.com/pocket996/deepfake-detection/releases/tag/v0.1.0)，解压后双击 FaceGuard.exe。[操作说明](../docs/TEAM_QUICKSTART.md)。
+**队友直接使用**：推荐下载 [Windows CPU 免安装预览版](https://github.com/pocket996/faceguard/releases/tag/v0.1.0)，解压后双击 FaceGuard.exe。[操作说明](../docs/TEAM_QUICKSTART.md)。
 
 **Git 源码快照说明**：源码树不包含本机 `.venv`、数据集、模型权重、特征、运行日志及个人测试图片；Release 附件另包含便携运行时与必要推理模型。下文“已经准备好”描述的是实测机器；新机器若需要源码训练，需先按本文及 GENERATION_README.md 重建环境和准备数据。YuNet 权重的获取方法见父目录 docs/ffpp-preparation.md。
 
@@ -12,7 +14,7 @@
 
 ## 1. 隔离方式
 
-- 独立代码：`D:\deepfake-detection\reference_run`。
+- 独立代码：`D:\faceguard\reference_run`。
 - 独立虚拟环境：本目录 `.venv`。依赖是原环境的物理副本，已经运行 pip check；不是 `--system-site-packages`，没有链接回原环境。
 - 独立权重、特征、模型、结果：本目录 `weights`、`artifacts`。
 - 原始数据及已处理图片只读取，不重新复制约 8.4 GiB 视频，也不改动原项目代码、数据、环境、输出。
@@ -22,8 +24,8 @@
 打开 PowerShell，执行：
 
 ```powershell
-cd D:\deepfake-detection\reference_run
-.\.venv\Scripts\python.exe -m pip check
+cd D:\faceguard\reference_run
+..\.venv\Scripts\python.exe -m pip check
 ```
 
 不需要激活环境，也不需要改 PowerShell 执行策略。不要用裸 `python` 或 `pip`，以免进入系统 Python 3.13。
@@ -33,7 +35,7 @@ cd D:\deepfake-detection\reference_run
 双击 `run_demo.cmd`，或：
 
 ```powershell
-.\.venv\Scripts\python.exe gui.py
+..\.venv\Scripts\python.exe gui.py
 ```
 
 界面按下面三步操作：
@@ -47,8 +49,8 @@ cd D:\deepfake-detection\reference_run
 命令行：
 
 ```powershell
-.\.venv\Scripts\python.exe predict.py 'D:\你的文件夹\照片.jpg' --task manipulation
-.\.venv\Scripts\python.exe predict.py 'D:\你的视频.mp4' --output artifacts/my_prediction.json
+..\.venv\Scripts\python.exe predict.py 'D:\你的文件夹\照片.jpg' --task manipulation
+..\.venv\Scripts\python.exe predict.py 'D:\你的视频.mp4' --output artifacts/my_prediction.json
 ```
 
 已经裁好的人脸图片可加 `--face-crop`；普通照片不要加。分数越高代表模型倾向于篡改，但分数没有经过概率校准，`0.9` 不等于“90% 概率为假”。图片和视频使用各自在验证集选出的阈值；图片阈值来自视频帧，不是独立照片验证集。
@@ -58,12 +60,12 @@ cd D:\deepfake-detection\reference_run
 前置数据已经完成：5,000 段 FF++ c23 视频 → 统一 YuNet 裁脸 → 79,994 张 PNG。原项目 `scripts/prepare_ffpp_manifest.py`、`scripts/prepare_ffpp_faces.py` 以及 `docs/ffpp-preparation.md` 记录下载、官方划分和裁脸过程。这次读取其真实产物，未重新下载或重做裁脸。
 
 ```powershell
-.\.venv\Scripts\python.exe train.py
-.\.venv\Scripts\python.exe holdout.py
-.\.venv\Scripts\python.exe finetune.py
-.\.venv\Scripts\python.exe verify.py
-.\.venv\Scripts\python.exe verify.py --variant finetuned
-.\.venv\Scripts\python.exe make_report.py
+..\.venv\Scripts\python.exe train.py
+..\.venv\Scripts\python.exe holdout.py
+..\.venv\Scripts\python.exe finetune.py
+..\.venv\Scripts\python.exe verify.py
+..\.venv\Scripts\python.exe verify.py --variant finetuned
+..\.venv\Scripts\python.exe make_report.py
 ```
 
 `train.py` 首次下载约 45 MB 官方 ImageNet 权重到本目录；随后遍历所有图片，核对路径、来源分组、重复编号，并计算解码后像素的 SHA256，遇到跨划分的精确重复会停止。它不能检测近重复、同人不同照或跨库身份泄漏。特征为冻结网络的 FP32 输出，保存在 `artifacts/features.npy`，约 156 MiB。

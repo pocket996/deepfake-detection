@@ -1,0 +1,4 @@
+# Fallback when the PyTorch index cannot be reached.
+# Windows x64 / Python 3.11 only; do not use on Linux/AutoDL.
+torch @ https://download.pytorch.org/whl/cu128/torch-2.9.0%2Bcu128-cp311-cp311-win_amd64.whl
+torchvision @ https://download.pytorch.org/whl/cu128/torchvision-0.24.0%2Bcu128-cp311-cp311-win_amd64.whl

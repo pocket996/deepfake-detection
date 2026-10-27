@@ -1,10 +1,12 @@
 # AI 人脸生成与篡改检测系统
 
+[Team environment setup](docs/TEAM_ENV_SETUP.md)
+
 面向包含人脸的照片与视频，检测 AI 整脸生成、换脸及面部篡改。现已完成独立参考实现，包括数据整理、模型训练与评估、命令行推理和中文桌面界面。
 
 ## 队友直接使用：Windows 免安装包
 
-打开 [v0.1.0 Releases](https://github.com/pocket996/deepfake-detection/releases/tag/v0.1.0)，下载 **FaceGuard-v0.1.0-windows-x64-cpu.zip**，完整解压后双击 **FaceGuard.exe**。不需要 Python、独立显卡或训练数据；不要误下载 GitHub 自动生成的 Source code 压缩包。
+打开 [v0.1.0 Releases](https://github.com/pocket996/faceguard/releases/tag/v0.1.0)，下载 **FaceGuard-v0.1.0-windows-x64-cpu.zip**，完整解压后双击 **FaceGuard.exe**。不需要 Python、独立显卡或训练数据；不要误下载 GitHub 自动生成的 Source code 压缩包。
 
 这是 Windows 10/11 x64 CPU 预览版，包含必要模型与运行时，只在本机处理文件。[队友操作说明](docs/TEAM_QUICKSTART.md) · [项目不足的大白话说明](docs/PROJECT_LIMITATIONS_PLAIN.md) · [模型范围与来源](docs/MODEL_CARD.md)。
 
@@ -47,7 +49,7 @@ FF++ 划分、抽帧裁脸及统一加载的运行方法见 [docs/ffpp-preparati
 
 完整安装版本记录在 `requirements-lock.txt`，该文件适用于本机Windows/Python 3.11/GPU环境。常规重建使用上述两个安装文件。
 
-VS Code中选择解释器 `D:\deepfake-detection\.venv\Scripts\python.exe`。运行程序时始终使用该虚拟环境，不要将依赖安装到系统Python 3.13。
+VS Code中选择解释器 `D:\faceguard\.venv\Scripts\python.exe`。运行程序时始终使用该虚拟环境，不要将依赖安装到系统Python 3.13。
 
 ## 当前准备状态
 

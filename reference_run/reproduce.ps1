@@ -1,9 +1,9 @@
 param([switch]$Train, [switch]$Generation)
 $ErrorActionPreference = 'Stop'
 Set-Location $PSScriptRoot
-$referencePython = Join-Path $PSScriptRoot '.venv/Scripts/python.exe'
+$referencePython = Join-Path (Split-Path -Parent $PSScriptRoot) '.venv/Scripts/python.exe'
 if (-not (Test-Path -LiteralPath $referencePython)) {
-    throw '先按照 README.md 创建 reference_run/.venv 并安装 requirements-lock.txt。'
+    throw '先按照 docs/ENVIRONMENT.md 创建项目根目录 .venv 并安装项目依赖。'
 }
 if ($Train) {
     & $referencePython train.py

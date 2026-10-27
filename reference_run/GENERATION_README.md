@@ -1,5 +1,7 @@
 # 整脸生成检测分支：复现与阅读
 
+[Current development environment setup](../docs/TEAM_ENV_SETUP.md). The commands below use the root .venv.
+
 当前默认联合版见 [GENERATION_CURRENT.md](GENERATION_CURRENT.md)。第一版「只用 FLUX 训练、SD3.5 完全留出」的原始实验保留在 [GENERATION_RESULTS.md](GENERATION_RESULTS.md)，不能把其成绩与联合训练版混为一谈。这是独立于 FF++ 换脸/篡改模型的实验分支。
 
 ## 使用
@@ -13,11 +15,11 @@
 结果中的“生成倾向分”与“篡改倾向分”来自两个不同模型，不可直接比较，也不是真假概率。没有人脸时返回“无法判断”。
 
 ```powershell
-cd D:\deepfake-detection\reference_run
-.\.venv\Scripts\python.exe predict.py 'D:\你的照片.jpg'
-.\.venv\Scripts\python.exe predict.py 'D:\你的照片.jpg' --task generation
-.\.venv\Scripts\python.exe predict.py 'D:\你的照片.jpg' --task manipulation
-.\.venv\Scripts\python.exe predict.py 'D:\你的视频.mp4'
+cd D:\faceguard\reference_run
+..\.venv\Scripts\python.exe predict.py 'D:\你的照片.jpg'
+..\.venv\Scripts\python.exe predict.py 'D:\你的照片.jpg' --task generation
+..\.venv\Scripts\python.exe predict.py 'D:\你的照片.jpg' --task manipulation
+..\.venv\Scripts\python.exe predict.py 'D:\你的视频.mp4'
 ```
 
 `--task auto` 是默认值。显式传 `--checkpoint` 时，旧命令仍按原换脸模型解释；自定义整脸生成权重应同时传 `--task generation`。
@@ -33,21 +35,21 @@ cd D:\deepfake-detection\reference_run
 ## 从数据到模型
 
 ```powershell
-.\.venv\Scripts\python.exe download_lfw.py
-.\.venv\Scripts\python.exe download_ffhq_subset.py
-.\.venv\Scripts\python.exe prepare_generation.py
-.\.venv\Scripts\python.exe train_generation.py
-.\.venv\Scripts\python.exe calibrate_generation.py
-.\.venv\Scripts\python.exe verify_generation.py
-.\.venv\Scripts\python.exe report_generation.py
+..\.venv\Scripts\python.exe download_lfw.py
+..\.venv\Scripts\python.exe download_ffhq_subset.py
+..\.venv\Scripts\python.exe prepare_generation.py
+..\.venv\Scripts\python.exe train_generation.py
+..\.venv\Scripts\python.exe calibrate_generation.py
+..\.venv\Scripts\python.exe verify_generation.py
+..\.venv\Scripts\python.exe report_generation.py
 # 覆盖两种已知生成器的联合版；本版本 SD3.5 不再是未见生成器
-.\.venv\Scripts\python.exe train_generation.py --include-sd35
-.\.venv\Scripts\python.exe calibrate_generation.py --experiment joint
-.\.venv\Scripts\python.exe verify_generation.py --experiment joint
-.\.venv\Scripts\python.exe activate_generation.py
-.\.venv\Scripts\python.exe gui.py --self-test --self-test-task generation
-.\.venv\Scripts\python.exe gui.py --self-test --self-test-task manipulation
-.\.venv\Scripts\python.exe report_generation_joint.py
+..\.venv\Scripts\python.exe train_generation.py --include-sd35
+..\.venv\Scripts\python.exe calibrate_generation.py --experiment joint
+..\.venv\Scripts\python.exe verify_generation.py --experiment joint
+..\.venv\Scripts\python.exe activate_generation.py
+..\.venv\Scripts\python.exe gui.py --self-test --self-test-task generation
+..\.venv\Scripts\python.exe gui.py --self-test --self-test-task manipulation
+..\.venv\Scripts\python.exe report_generation_joint.py
 ```
 
 父项目 `data/raw/fairfacegen` 下需有两个种子包；若缺少，先运行父项目 `scripts/download_fairfacegen.py`。当前已经具备。重跑 `prepare_generation.py` 会在本参考目录重建派生图片与清单，原始数据保留。
