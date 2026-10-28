@@ -6,3 +6,4 @@ outputs/
 *.pyc
 tools/download-FaceForensics.py
 artifacts/
+.vscode/
